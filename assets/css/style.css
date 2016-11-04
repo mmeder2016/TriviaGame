@@ -36,18 +36,14 @@ h3 {
 	font-weight: bold;
 	padding: .3em 0;
 }
-#id-start-button {
-	height:10%;
-	font-size: 1.5em;
-	font-family: "Arial";
-	font-weight: bold;
-}
+
 
 .div-content {
 	background-color: #ffe6e6;
 	width:100%;
 	height:100%;
 }
+/*div-center has 3 children div-time id-start-button and div-qa (question and answers)*/
 .div-center {
 	background-color: #f2e6e6;
 	margin: 0 auto;
@@ -60,6 +56,14 @@ h3 {
 	width:30em;
 	height:20%;
 }
+
+#id-start-button {
+	height:10%;
+	font-size: 1.5em;
+	font-family: "Arial";
+	font-weight: bold;
+}
+/*This div contains 3 divs, div-q (question) div-choice (answer choices) div-a (answer)*/
 .div-qa {
 	background-color: #66ff33;
 	margin: 0 auto;
@@ -68,13 +72,15 @@ h3 {
 }
 .div-q {
 	height:20%;
-
+	border: 1px solid black;
 }
 
 .div-choice {
 	height:60%;
+	border: 1px solid black;
 }
 
 .div-a {
 	height:20%;
+	border: 1px solid black;
 }
