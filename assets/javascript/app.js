@@ -1,5 +1,30 @@
 $(document).ready(function() {
 
+    // 1.) TIMER CODE 
+    // The time allowed to answer the question in seconds
+    var allowedTime = 3;
+    var tempTime = allowedTime;
+    var intv; // variable to hold the interval timer
+
+    function outOfTime() {
+        clearInterval(intv);        
+        $('.div-time').text('Time ran out!');
+    }
+    function startCountdown() {
+        tempTime = allowedTime;
+        intv = setInterval(countdownTimer, 1000);
+    }
+    function countdownTimer() {
+        tempTime--;
+        if(tempTime === 0) {
+            outOfTime();
+        } else {
+            $('.div-time').text( tempTime.toString() + ' seconds left.');
+        }
+    }
+
+
+    // 2.) EVENT HANDLERS
     // Start the game
     $("#id-start-button").click(function() {
         renderQuestionAndAnswers();        
@@ -8,7 +33,9 @@ $(document).ready(function() {
     // Handle clicking on one of the answer choices
     $(document).on('click', '.game-choice', renderResult);
 
+    // 3.) FUNCTIONS FOR EVENT HANDLERS
     function renderQuestionAndAnswers() {
+        // Clear the Question and Answers area
         $('.div-choice').empty();
         // Render the Question
         $('.div-q').html('<h2>' + gameObj.getQuestion() + '</h2>');
@@ -24,6 +51,8 @@ $(document).ready(function() {
         }
         // Render the state click button or answer question 
         $('.div-a').html('<h2>Click on the correct answer.</h2>');
+        startCountdown();
+        //setTimeout(outOfTime, allowedTime*1000);
     }
 
     function renderResult() {
@@ -37,7 +66,7 @@ $(document).ready(function() {
             $('.div-a').html('<h2>WRONG CORRECT ANSWER IS ' + correctAnswer + '</h2>');
     }
 
-    // array of objects
+    // 4.) GAME OBJECT
     var gameObj = {
 
         currentQuestion: -1,
