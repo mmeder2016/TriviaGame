@@ -2,25 +2,34 @@ $(document).ready(function() {
 
     // 1.) TIMER CODE 
     // The time allowed to answer the question in seconds
-    var allowedTime = 3;
+    var allowedTime = 10;
     var tempTime = allowedTime;
-    var intv; // variable to hold the interval timer
+    // variable to hold the interval timer
+    //   cleared in renderQuestionAndAnswers()
+    //   cleared in renderGuessResult()
+    var intervalAllowedTime; 
+    // After no attemot to answer question, we will display the result and 
+    // wait a few seconds before displaying the next question
+    var intervalAfterTimeout; 
 
     function outOfTime() {
-        clearInterval(intv);        
+        clearInterval(intervalAllowedTime);        
         $('.div-time').text('Time ran out!');
+        // Wait 3 seconds to display next question
+        intervalAfterTimeout = setTimeout(renderQuestionAndAnswers, 3000);
+
     }
     function startCountdown() {
         tempTime = allowedTime;
-        intv = setInterval(countdownTimer, 1000);
+        intervalAllowedTime = setInterval(countdownTimer, 1000);
     }
     function countdownTimer() {
-        tempTime--;
-        if(tempTime === 0) {
+        if(tempTime <= 0) {
             outOfTime();
         } else {
             $('.div-time').text( tempTime.toString() + ' seconds left.');
         }
+        tempTime--;      
     }
 
 
@@ -31,10 +40,12 @@ $(document).ready(function() {
     });
 
     // Handle clicking on one of the answer choices
-    $(document).on('click', '.game-choice', renderResult);
+    $(document).on('click', '.game-choice', renderGuessResult);
 
     // 3.) FUNCTIONS FOR EVENT HANDLERS
     function renderQuestionAndAnswers() {
+        // clear the timer for allowed time
+        clearInterval(intervalAllowedTime);
         // Clear the Question and Answers area
         $('.div-choice').empty();
         // Render the Question
@@ -52,10 +63,12 @@ $(document).ready(function() {
         // Render the state click button or answer question 
         $('.div-a').html('<h2>Click on the correct answer.</h2>');
         startCountdown();
-        //setTimeout(outOfTime, allowedTime*1000);
     }
 
-    function renderResult() {
+    function renderGuessResult() {
+        // clear the timer for allowed time
+        clearInterval(intervalAllowedTime);
+
         var el = $(this).attr('choice-index');
         console.log(el);
 
