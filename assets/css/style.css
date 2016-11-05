@@ -91,6 +91,9 @@ h3 {
 	/*border: 1px solid black;*/
 }
 /**/
+.game-choice {
+	cursor: pointer;
+}
 .game-choice:hover {
 	background-color: #badbad;
 	margin: 0 auto;
@@ -98,10 +101,16 @@ h3 {
 }
 
 @media screen and (max-width: 640px) {
+	.div-center {
+		width:25em;
+	}	
 	.div-qa {
 		/*background-color: #66ff33;*/
 		margin: 0 auto;
 		width:25em;
 		height:80%;
+	}
+	.div-time {
+		width:25em;
 	}
 }
