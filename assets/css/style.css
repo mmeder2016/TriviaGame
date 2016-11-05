@@ -96,3 +96,12 @@ h3 {
 	margin: 0 auto;
 	width: 10em;
 }
+
+@media screen and (max-width: 640px) {
+	.div-qa {
+		/*background-color: #66ff33;*/
+		margin: 0 auto;
+		width:25em;
+		height:80%;
+	}
+}
