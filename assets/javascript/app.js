@@ -17,6 +17,10 @@ $(document).ready(function() {
                 },
                 getLosses: function() {
                     return losses;
+                },
+                reset: function() {
+                    wins = 0;
+                    losses = 0;
                 }
             };
         }
@@ -61,16 +65,21 @@ $(document).ready(function() {
     )();
 
     // 3.) TIMER CODE
+    // Added as a Last minut bugfix for end game button. If end game button is
+    // clicked during this timer, the game restarts itself. So te delayTimer
+    // must be cleared
+    var delayTimer;
     // When each question is either answered or times out, this function is
     // called to delay and then initiate the next question
     function delayBeforeNextQuestion() {
         // delay 3 seconds
-        setTimeout(renderQuestionAndAnswers, gameTimer.getDelayBetweenGames());
+        delayTimer = setTimeout(renderQuestionAndAnswers, gameTimer.getDelayBetweenGames());
         $('.game-status').text('Wins: ' + gameStats.getWins() + ' Losses: ' + gameStats.getLosses());
         // turn off click events to the answer choices. If you don't do this,
         // rapidly clicking on answers during this delay runs up the score 
         $('.game-choice').click(false);
     }
+
 
     function countdownTimer() {
         if (gameTimer.getSecondsRemaining() <= 0) {
@@ -98,6 +107,23 @@ $(document).ready(function() {
     });
     // Handle clicking on one of the answer choices
     $(document).on('click', '.game-choice', renderGuessResult);
+    // End the game
+    $("#id-end-button").click(function() {
+        // clear the timer for allowed time
+        gameTimer.clear();
+        // Clear the Question and Answers area
+        $('.div-choice').empty();
+        $('.div-q').empty();
+        $('.div-a').empty();
+        // Enable the start button
+        $("#id-start-button").prop("disabled",false);
+        // Display the wins and losses
+        $('.game-status').text('Wins: ' + gameStats.getWins() + ' Losses: ' + gameStats.getLosses());
+        // Make sure this isn't about to restart the game
+        clearTimeout(delayTimer);
+        // Reset the game stats
+        gameStats.reset();
+    });
 
     // 5.) FUNCTIONS FOR EVENT HANDLERS
     function renderQuestionAndAnswers() {
@@ -119,19 +145,21 @@ $(document).ready(function() {
             // creating here
             h.attr('choice-index', i); // currently not needed
             // a. answer, b. answer etc.
-            h.text(String.fromCharCode('a'.charCodeAt() + i) + '. ' + gameObj.getChoiceNumber(i));
+            //h.text(String.fromCharCode('a'.charCodeAt() + i) + '. ' + gameObj.getChoiceNumber(i));
+            h.text(gameObj.getChoiceNumber(i));
             $('.div-choice').append(h);
         }
         // Render the state click button or answer question 
         $('.div-a').html('<h2>Click on the correct answer.</h2>');
         gameTimer.startCountdown();
+        $("#id-start-button").prop("disabled",true);
     }
 
     function renderGuessResult() {
         // clear the timer for allowed time
         gameTimer.clear();
         var correctAnswer = gameObj.getAnswer();
-        if ($(this).text().endsWith(correctAnswer)) {
+        if ($(this).text() === correctAnswer) {
             $('.div-a').html('<h2>CORRECT ANSWER: ' + correctAnswer + '</h2>');
             gameStats.win();
         } else {
@@ -139,6 +167,7 @@ $(document).ready(function() {
             gameStats.lose();
         }
         delayBeforeNextQuestion();
+        $("#id-start-button").prop("disabled",false);
     }
 
     // 6.) GAME OBJECT
@@ -149,20 +178,32 @@ $(document).ready(function() {
         // choices - array of possible answers
         // a is the index of the correct answer
         questions: [{
+            q: "Fuzzy Wuzzy was a bear. Fuzzy Wuzzy had no hair. Fuzzy Wuzzy wasn't very fuzzy, was he?",
+            choice: ['Yes', 'No'],
+            a: 1
+        },{
             q: "What is 2 + 2",
             choice: ['6', '5', '4', '3'],
             a: 2
         }, {
-            q: "What is 9 * 3",
-            choice: ['24', '27', '30', '33'],
-            a: 1
+            q: "If there are 23 people in a room, what is the probability 2 of them will have the same birthday?",
+            choice: ['5.9 %', '25.4 %', '50.7 %', '75.2 %'],
+            a: 2
         }, {
-            q: "What is 8 * 5",
-            choice: ['35', '40', '45', '50'],
-            a: 1
+            q: "Are multiple choice questions an accurate measurement of ones knowledge?",
+            choice: ['A.) Yes', 'B.) A and C', 'C:) A and B', 'D.) All of the above'],
+            a: 3
         }, {
             q: "What is 8 * 3",
             choice: ['18', '21', '24', '27'],
+            a: 2
+        },{
+            q: "What is blue and smells like red paint?",
+            choice: ['No', 'Your mamma', 'Blue Paint'],
+            a: 2
+        },{
+            q: "What is 1 + 1?",
+            choice: ['Not this one', 'Or this one', '2', 'Go up 1', 'Go up 2'],
             a: 2
         }],
         // returns the number of choices of answers to an individual question
@@ -172,7 +213,9 @@ $(document).ready(function() {
         // generates a random index into the questions array and returns the
         // corresponding question
         setNewQuestion: function() {
-            this.currentQuestion = Math.floor((Math.random() * this.questions.length));
+            //this.currentQuestion = Math.floor((Math.random() * this.questions.length));
+            this.currentQuestion++;
+            this.currentQuestion %= this.questions.length;
             return this.questions[this.currentQuestion].q;
         },
         // for the current question, returns the choices at index n of the 

@@ -4,13 +4,15 @@
 }
 header {
 	text-align: center;
-	border-bottom: solid .3em #4aaaa5;
-	color: black;
+	border-bottom: solid .3em #04aaa5;
+	color: ##04aaa5;
 	width: 100%;
+	background: transparent;
 }
 body{
 	text-align: center;
-
+	background-image: url("../images/pastel-tie-dye-wallpaper-6.jpg");
+	color: #04aaa5;
 }
 footer {
 	clear:left;
@@ -39,48 +41,58 @@ h3 {
 
 
 .div-content {
-	background-color: #ffe6e6;
+	/*background-color: #ffe6e6;*/
+	/*background-image: url("../images/maxresdefault.jpg");*/
 	width:100%;
 	height:100%;
 }
 /*div-center has 3 children div-time id-start-button and div-qa (question and answers)*/
 .div-center {
-	background-color: #f2e6e6;
+	/*background-color: #f2e6e6;*/
+
 	margin: 0 auto;
 	width:30em;
 	height:30em;
 }
 .div-time {
-	background-color: #ffcc66;
+	/*background-color: #ffcc66;*/
+	background: transparent;
 	margin: 0 auto;
 	width:30em;
-	height:20%;
+	height:10%;
 }
 
-#id-start-button {
+#id-start-button, #id-end-button {
 	height:10%;
+	color: #04aaa5;
 	font-size: 1.5em;
 	font-family: "Arial";
 	font-weight: bold;
+	background: transparent;
 }
-/*This div contains 3 divs, div-q (question) div-choice (answer choices) div-a (answer)*/
+/*This div-qa contains 3 divs, div-q (question) div-choice (answer choices) div-a (answer)*/
 .div-qa {
-	background-color: #66ff33;
+	/*background-color: #66ff33;*/
 	margin: 0 auto;
 	width:30em;
-	height:70%;
+	height:80%;
+
 }
 .div-q {
-	height:20%;
-	border: 1px solid black;
+	height:30%;
+	/*border: 1px solid black;*/
 }
-
 .div-choice {
-	height:60%;
-	border: 1px solid black;
+	height:50%;
+	/*border: 1px solid black;*/
 }
-
 .div-a {
 	height:20%;
-	border: 1px solid black;
+	/*border: 1px solid black;*/
+}
+/**/
+.game-choice:hover {
+	background-color: #badbad;
+	margin: 0 auto;
+	width: 10em;
 }
