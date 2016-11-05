@@ -1,7 +1,6 @@
 $(document).ready(function() {
-
-    // 0.) MY FIRST CLOSURE - An attempt to remove variables from the global 
-    // namespace. Shamelessly cut, pasted, and modified from MDN.
+    // 1.) GAME STATISTICS CLOSURE - Remove variables from the global 
+    // namespace.
     var gameStats = (
         function() {
             var wins = 0;
@@ -19,77 +18,97 @@ $(document).ready(function() {
                 getLosses: function() {
                     return losses;
                 }
-            };   
+            };
         }
     )();
 
-    // 1.) TIMER CODE 
-    // The time allowed in seconds to answer the question. This value is
-    // designed to never change
-    var allowedTime = 10;
-    // temp variable to hold the decrementing count of seconds left to answer
-    // the question
-    var secondsRemaining = allowedTime; 
-    // variable to hold the interval timer
-    //   cleared in renderQuestionAndAnswers()
-    //   cleared in renderGuessResult()
-    var intervalAllowedTime; 
+    // 2.) TIMER CODE CLOSURE - Remove variables from the global 
+    // namespace.
+    var gameTimer = (
+        function() {
+            // The time allowed in seconds to answer the question. This value is
+            // designed to never change
+            var allowedTime = 10;
+            var delayBetweenGames = 3000;
+            // temp variable to hold the decrementing count of seconds left to answer
+            // the question
+            var secondsRemaining = -1;
+            // variable to hold the interval timer
+            //   cleared in renderQuestionAndAnswers()
+            //   cleared in renderGuessResult()
+            var intervalAllowedTime;
+            return {
+                // startCountdown and countdownTimer manage the game functionality
+                // of what to do if the time to answer the question runs out
+                startCountdown() {
+                    secondsRemaining = allowedTime;
+                    intervalAllowedTime = setInterval(countdownTimer, 1000);
+                },
+                decrement() {
+                    secondsRemaining--;
+                },
+                clear() {
+                    clearInterval(intervalAllowedTime);
+                },
+                getSecondsRemaining() {
+                    return secondsRemaining;
+                },
+                getDelayBetweenGames() {
+                    return delayBetweenGames;
+                }
+            };
+        }
+    )();
 
+    // 3.) TIMER CODE
     // When each question is either answered or times out, this function is
     // called to delay and then initiate the next question
-    function delayBeforeNextQuestion()
-    {
-        setTimeout(renderQuestionAndAnswers, 3000);
+    function delayBeforeNextQuestion() {
+        // delay 3 seconds
+        setTimeout(renderQuestionAndAnswers, gameTimer.getDelayBetweenGames());
         $('.game-status').text('Wins: ' + gameStats.getWins() + ' Losses: ' + gameStats.getLosses());
         // turn off click events to the answer choices. If you don't do this,
         // rapidly clicking on answers during this delay runs up the score 
         $('.game-choice').click(false);
     }
-    // startCountdown and countdownTimer manage the game functionality
-    // of what to do if the time to answer the question runs out 
-    function startCountdown() {
-        secondsRemaining = allowedTime;
-        intervalAllowedTime = setInterval(countdownTimer, 1000);
-    }
+
     function countdownTimer() {
-        if(secondsRemaining <= 0) {
+        if (gameTimer.getSecondsRemaining() <= 0) {
             outOfTime();
         } else {
-
-            $('.game-status').text( secondsRemaining.toString() + ' seconds left.');
+            $('.game-status').text(gameTimer.getSecondsRemaining().toString() + ' seconds left.');
         }
-        secondsRemaining--;      
+        gameTimer.decrement();
     }
     // After no attempt to answer question, we will display the result and 
     // wait a few seconds before displaying the next question
     //var intervalAfterTimeout; 
     function outOfTime() {
-        clearInterval(intervalAllowedTime);        
-        $('.game-status').text('Time ran out!');
+        gameTimer.clear();
+        $('.div-a').html('<h2>Time ran out!</h2><h2>The correct answer was ' + gameObj.getAnswer() + '</h2>');
+        gameStats.lose();
         // Wait 3 seconds to display next question
         delayBeforeNextQuestion();
-        gameStats.lose();
     }
 
-    // 2.) EVENT HANDLERS
+    // 4.) EVENT HANDLERS
     // Start the game
     $("#id-start-button").click(function() {
-        renderQuestionAndAnswers();        
+        renderQuestionAndAnswers();
     });
-
     // Handle clicking on one of the answer choices
     $(document).on('click', '.game-choice', renderGuessResult);
 
-    // 3.) FUNCTIONS FOR EVENT HANDLERS
+    // 5.) FUNCTIONS FOR EVENT HANDLERS
     function renderQuestionAndAnswers() {
         // clear the timer for allowed time
-        clearInterval(intervalAllowedTime);
+        gameTimer.clear();
         // Clear the Question and Answers area
         $('.div-choice').empty();
         // Render the Question
         $('.div-q').html('<h2>' + gameObj.setNewQuestion() + '</h2>');
         // Render the answers
-        for(var i = 0; i < gameObj.getNumberOfChoices(); i++) {
+        for (var i = 0; i < gameObj.getNumberOfChoices(); i++) {
             // JQuery <h2>
             var h = $('<h2>');
             h.addClass('game-choice');
@@ -100,38 +119,35 @@ $(document).ready(function() {
             // creating here
             h.attr('choice-index', i); // currently not needed
             // a. answer, b. answer etc.
-            h.text(String.fromCharCode('a'.charCodeAt() + i) + '. '+ gameObj.getChoiceNumber(i));
+            h.text(String.fromCharCode('a'.charCodeAt() + i) + '. ' + gameObj.getChoiceNumber(i));
             $('.div-choice').append(h);
         }
         // Render the state click button or answer question 
         $('.div-a').html('<h2>Click on the correct answer.</h2>');
-        startCountdown();
+        gameTimer.startCountdown();
     }
 
     function renderGuessResult() {
         // clear the timer for allowed time
-        clearInterval(intervalAllowedTime);
-
+        gameTimer.clear();
         var correctAnswer = gameObj.getAnswer();
         if ($(this).text().endsWith(correctAnswer)) {
-            $('.div-a').html('<h2>CORRECT: ' + correctAnswer + '</h2>');
+            $('.div-a').html('<h2>CORRECT ANSWER: ' + correctAnswer + '</h2>');
             gameStats.win();
-        }
-        else {
-            $('.div-a').html('<h2>WRONG CORRECT ANSWER IS ' + correctAnswer + '</h2>');
+        } else {
+            $('.div-a').html('<h2>WRONG, CORRECT ANSWER IS ' + correctAnswer + '</h2>');
             gameStats.lose();
         }
         delayBeforeNextQuestion();
     }
 
-    // 4.) GAME OBJECT
+    // 6.) GAME OBJECT
     var gameObj = {
         // the index into the questions array
         currentQuestion: -1,
-
         // q - is the question
         // choices - array of possible answers
-        // 
+        // a is the index of the correct answer
         questions: [{
             q: "What is 2 + 2",
             choice: ['6', '5', '4', '3'],
