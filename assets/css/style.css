@@ -102,15 +102,15 @@ h3 {
 
 @media screen and (max-width: 640px) {
 	.div-center {
-		width:25em;
+		width:23em;
 	}	
 	.div-qa {
 		/*background-color: #66ff33;*/
 		margin: 0 auto;
-		width:25em;
+		width:23em;
 		height:80%;
 	}
 	.div-time {
-		width:25em;
+		width:23em;
 	}
 }
